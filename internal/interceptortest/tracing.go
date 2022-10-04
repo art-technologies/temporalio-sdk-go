@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.temporal.io/sdk/activity"
 
 	"go.temporal.io/sdk/interceptor"
 	"go.temporal.io/sdk/testsuite"
@@ -166,6 +167,7 @@ func workflowInternal(ctx workflow.Context, waitSignal bool) (ret []string, err 
 }
 
 func testActivity(ctx context.Context) ([]string, error) {
+	activity.GetLogger(ctx).Info("test logger")
 	return []string{"act"}, nil
 }
 

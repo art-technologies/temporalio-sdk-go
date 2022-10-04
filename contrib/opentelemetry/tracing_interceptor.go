@@ -32,6 +32,7 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
+	"go.temporal.io/sdk/log"
 
 	"go.temporal.io/sdk/interceptor"
 )
@@ -77,7 +78,11 @@ type TracerOptions struct {
 
 type spanContextKey struct{}
 
-const defaultHeaderKey = "_tracer-data"
+const (
+	defaultHeaderKey = "_tracer-data"
+	traceIDLogKey    = "traceID"
+	spanIDLogKey     = "spanID"
+)
 
 type tracer struct {
 	interceptor.BaseTracer
@@ -188,6 +193,24 @@ func (t *tracer) StartSpan(opts *interceptor.TracerStartSpanOptions) (intercepto
 	}
 
 	return &tracerSpan{Span: span}, nil
+}
+
+func (t *tracer) GetLogger(logger log.Logger, ref interceptor.TracerSpanRef) log.Logger {
+	var span trace.SpanContext
+	switch v := ref.(type) {
+	case *tracerSpanRef:
+		span = v.SpanContext
+	case *tracerSpan:
+		span = v.SpanContext()
+	}
+	if !span.IsValid() {
+		return logger
+	}
+	return log.With(
+		logger,
+		traceIDLogKey, span.TraceID().String(),
+		spanIDLogKey, span.SpanID().String(),
+	)
 }
 
 type tracerSpanRef struct{ trace.SpanContext }
