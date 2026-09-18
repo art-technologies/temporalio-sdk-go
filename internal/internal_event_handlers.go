@@ -572,7 +572,7 @@ func (wc *workflowEnvironmentImpl) ExecuteChildWorkflow(
 	// The Go SDK interceptor sets this before serialization so it's available
 	// to context-aware codecs, but bindings callers may not set it.
 	if params.WorkflowID == "" {
-		params.WorkflowID = wc.workflowInfo.currentRunID + "_" + wc.GenerateSequenceID()
+		params.WorkflowID = verseChildWorkflowIDSeed(wc.workflowInfo) + "_" + wc.GenerateSequenceID()
 	}
 	memo, err := GetWorkflowMemo(params.Memo, wc.dataConverter, wc.TryUse(SDKFlagMemoUserDCEncode))
 	if err != nil {
@@ -2302,4 +2302,13 @@ func convertContinueAsNewSuggestedReasonsFromProto(
 		converted = append(converted, ContinueAsNewSuggestedReason(reason))
 	}
 	return converted
+}
+
+// verseChildWorkflowIDSeed preserves child IDs for reset histories written by
+// the production 2024 fork. Do not remove until those histories are migrated.
+func verseChildWorkflowIDSeed(info *WorkflowInfo) string {
+	if info.OriginalRunID != "" {
+		return info.OriginalRunID
+	}
+	return info.WorkflowExecution.RunID
 }

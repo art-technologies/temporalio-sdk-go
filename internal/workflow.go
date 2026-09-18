@@ -1419,7 +1419,7 @@ func (wc *workflowEnvironmentInterceptor) ExecuteChildWorkflow(ctx Context, chil
 	if workflowOptionsFromCtx.WorkflowID != "" {
 		childWorkflowID = workflowOptionsFromCtx.WorkflowID
 	} else {
-		childWorkflowID = env.WorkflowInfo().currentRunID + "_" + getStringID(env.GenerateSequence())
+		childWorkflowID = verseChildWorkflowIDSeed(env.WorkflowInfo()) + "_" + getStringID(env.GenerateSequence())
 	}
 	wfInfo := env.WorkflowInfo()
 	childWfCtx := converter.WorkflowSerializationContext{

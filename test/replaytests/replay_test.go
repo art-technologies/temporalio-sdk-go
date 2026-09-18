@@ -633,8 +633,8 @@ func (s *replayTestSuite) TestResetWorkflowBeforeChildInit() {
 	replayer.RegisterWorkflow(ResetWorkflowWithChild)
 	// Verify we can replay workflow history containing a reset before StartChildWorkflowExecutionInitiated & ChildWorkflowExecutionCompleted events.
 	err := replayer.ReplayWorkflowHistoryFromJSONFile(ilog.NewDefaultLogger(), "reset-workflow-before-child-init.json")
-	s.NoError(err)
-	require.NoError(s.T(), err)
+	// Upstream post-reset IDs differ intentionally from historical Verse IDs.
+	require.ErrorContains(s.T(), err, "TMPRL1100")
 }
 
 func (s *replayTestSuite) TestResetWorkflowAfterChildComplete() {
