@@ -2601,6 +2601,10 @@ func (ts *IntegrationTestSuite) TestResetWorkflowExecutionWithChildren() {
 
 	childIDsAfterReset1 := ts.getChildWFIDsFromHistory(ctx, wfID, resp.GetRunId())
 	ts.Len(childIDsAfterReset1, 3)
+	// Verse keeps the original run seed; reset may still change command sequence suffixes.
+	for _, id := range childIDsAfterReset1 {
+		ts.True(strings.HasPrefix(id, run.GetRunID()+"_"))
+	}
 	// All 3 child workflow IDs should be different after reset.
 	ts.NotEqual(child1IDBeforeReset, childIDsAfterReset1[0])
 	ts.NotEqual(child2IDBeforeReset, childIDsAfterReset1[1])

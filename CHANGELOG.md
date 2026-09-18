@@ -24,6 +24,8 @@ to docs, or any other relevant information.
 
 ### Changed
 
+- Verse fork: preserve OriginalRunID-based implicit child workflow IDs across resets, matching the deployed 2024 fork. Both serialization and bindings use the same seed.
+
 ### Deprecated
 
 ### :boom: Breaking Changes
